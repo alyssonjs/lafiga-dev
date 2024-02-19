@@ -1,0 +1,41 @@
+version: '3.5'
+
+services:
+  database:
+    image: postgres
+    container_name: lafiga_db
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: lafiga_api
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: lafiga-api_db_1
+  
+  redis:
+    image: redis
+
+  api:
+    build: ./api/
+    container_name: lafiga_api
+    image: lafiga/api-develop:latest
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - ./api/app:/lafiga-api
+      - ./api/bundler_gems:/user/local/bundle/
+    ports:
+      - "8000:3000"
+    depends_on:
+      - database
+
+  front:
+    build: ./front/
+    container_name: lafiga_front
+    image: lafiga/front-develop:latest
+    tty: true
+    volumes:
+      - ./front/app:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
