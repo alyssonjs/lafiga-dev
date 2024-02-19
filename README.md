@@ -13,22 +13,22 @@ Foi criando symlinks com caminho relativo de arquivos para facilitar a vida, no 
 Caso não queira alterar o nome das pastas, crie um novo symlink e substitua o antigo.
 <br><br>
 
-Renomeie o nome da pasta no respectivo formato:<br><br>
- &nbsp;    -projeto backend/api -> api<br>
- &nbsp;    -projeto frontend -> front<br>
+Ao clonar os repositórios, os nomes das pastas estarão com o nome do repositório, é preciso alterar o nome das pastas para que os atalhos funcionem corretamente<br>
+ &nbsp;    - trocar lafiga-api para api<br>
+ &nbsp;    - trocar lafiga-front para front<br>
 <br><br>
 ## Observações Individuais de cada projeto:<br>
 ### front
-      - Ao atualizar o package.json (normalmente acontece devido a adição de uma nova biblioteca), atualize o package.json dentro do projeto front na  pasta config no docker e rebuilde o container<br>
-      ```bash
-      front/config/package.json
-      ```
+      - Ao atualizar o package.json (normalmente acontece devido a adição de uma nova biblioteca), atualize o package.json dentro do projeto front na  pasta config no docker e rebuilde o container
+
+      - front/config/package.json
+
 ### api
-    - Ao atualizar o gemfile (normalmente acontece devido a adição de uma nova gem), atualizar o gemfile e o gemfile.lock dentro do projeto api na pasta config no docker e rebuilde o container;<br>
-    ```bash
-      api/config/Gemfile
-      api/config/Gemfile.lock
-    ```
+    - Ao atualizar o gemfile (normalmente acontece devido a adição de uma nova gem), atualizar o gemfile e o gemfile.lock dentro do projeto api na pasta config no docker e rebuilde o container;
+    
+    - api/config/Gemfile
+    - api/config/Gemfile.lock
+    
 #### Para realizar a conexão com o banco de dados, é preciso criar manualmente o usuário e o banco de dados, com o container rodando: 
 ```bash
 docker exec -it lafiga_db bash
