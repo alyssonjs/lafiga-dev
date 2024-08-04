@@ -10,7 +10,7 @@ RUN bundle install
 RUN bundle update listen
 
 
-# Add a script to be executed every time the container starts. comentario denescessário
+# Add a script to be executed every time the container starts.
 COPY ./config/entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
