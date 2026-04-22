@@ -1,39 +1,50 @@
-## Ambiente de desenvolvimento Lafiga
+# Láfiga — ambiente de desenvolvimento (Docker)
 
+Stack: **PostgreSQL**, **Redis**, **API Rails** (`../api`) e o **front Vite** no repositório **`lafiga-web`** (`../lafiga-web`).
 
-baixe os reposítorios no mesmo nível de arquivos, exemplo:
-<br>
-<br>
-lafiga:<br>
-&nbsp;    - lafiga_api<br>
-&nbsp;    - docker<br>
-&nbsp;    - lafiga_front<br>
-<br><br>
-Foi criando symlinks com caminho relativo de arquivos para facilitar a vida, no entantno para usa-los, será preciso alterar o nome das pastas,
-Caso não queira alterar o nome das pastas, crie um novo symlink e substitua o antigo.
-<br><br>
+## Repositório do front (`lafiga-web`)
 
-Ao clonar os repositórios, os nomes das pastas estarão com o nome do repositório, é preciso alterar o nome das pastas para que os atalhos funcionem corretamente<br>
- &nbsp;    - trocar lafiga-api para api<br>
- &nbsp;    - trocar lafiga-front para front<br>
-<br><br>
-## Observações Individuais de cada projeto:<br>
-### front
-      - Ao atualizar o package.json (normalmente acontece devido a adição de uma nova biblioteca), atualize o package.json dentro do projeto front na  pasta config no docker e rebuilde o container
+O Docker monta **`../lafiga-web`** (submódulo Git ao lado de `api/` e desta pasta).
 
-      - front/config/package.json
+Ao clonar o monorepo `lafiga`, inicializa o submódulo:
 
-### api
-    - Ao atualizar o gemfile (normalmente acontece devido a adição de uma nova gem), atualizar o gemfile e o gemfile.lock dentro do projeto api na pasta config no docker e rebuilde o container;
-    
-    - api/config/Gemfile
-    - api/config/Gemfile.lock
-    
-#### Para realizar a conexão com o banco de dados, é preciso criar manualmente o usuário e o banco de dados, com o container rodando: 
 ```bash
-docker exec -it lafiga_db bash
-psql -U postgres
-create user lafiga_api with password 'password';
-create database "lafiga-api_db_1"  owner lafiga_api;
-alter user lafiga_api superuser createrole createdb replication;
+git submodule update --init --recursive
 ```
+
+(Alternativa manual: `git clone https://github.com/alyssonjs/lafiga-web.git ../lafiga-web` na raiz do monorepo.)
+
+A pasta legada **`front-lafiga`** no mesmo nível **não** é usada por este compose; o código canónico do SPA é **`lafiga-web`**.
+
+## Subir tudo
+
+Na raiz desta pasta:
+
+```bash
+docker compose up --build
+```
+
+| Serviço | URL |
+|--------|-----|
+| **Front (Vite)** | http://localhost:5173 |
+| **API Rails** | http://localhost:3001 |
+| **PostgreSQL** | `localhost:5432` (user `lafiga_api`, DB `lafiga-api_db_1`) |
+| **Redis** | `localhost:6379` |
+
+O browser chama a API em `http://localhost:3001` (`VITE_API_BASE_URL`). O CORS da API já inclui a origem do Vite (`5173`).
+
+## Front antigo (Next.js)
+
+O app em `../front` **não** é mais montado neste compose. Para voltar a usá-lo, restaure o bloco `front` anterior no histórico do Git (volume `../front`, porta `3000`, `NEXT_PUBLIC_API_BASE_URL`).
+
+## Variáveis úteis (front)
+
+Definidas no `docker-compose.yml` para o serviço `front`. Para ajustar localmente, copie `../lafiga-web/.env.example` para `.env` na pasta `lafiga-web`.
+
+- `VITE_API_BASE_URL` — base da API (no host, não use o nome do container).
+- `VITE_USE_MOCK_DATA` — `false` para usar a API nos catálogos integrados.
+- `VITE_DEFAULT_PLAYER_ROLE_ID` — `role_id` do jogador no signup (alinhar ao seed Rails).
+
+## `node_modules` no Docker
+
+O volume nomeado `front_lafiga_node_modules` mantém dependências do Vite **dentro** do container, evitando misturar com o sistema de ficheiros do host (útil em macOS/ARM).

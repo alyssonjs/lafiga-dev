@@ -1,41 +1,73 @@
-version: '3.5'
+version: '3.9'
 
 services:
   database:
-    image: postgres
+    image: postgres:17
     container_name: lafiga_db
+    restart: unless-stopped
     volumes:
       - ./tmp/db:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: lafiga_api
       POSTGRES_PASSWORD: password
       POSTGRES_DB: lafiga-api_db_1
-  
+    ports:
+      - "5432:5432"
+
   redis:
-    image: redis
+    image: redis:7
+    container_name: lafiga_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
 
   api:
-    build: ./api/
-    container_name: lafiga_api
+    build:
+      context: ../api
+      dockerfile: Dockerfile
     image: lafiga/api-develop:latest
+    container_name: lafiga_api
+    restart: unless-stopped
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3001 -b '0.0.0.0'"
+    working_dir: /lafiga-api
     volumes:
-      - ./api/app:/lafiga-api
-      - ./api/bundler_gems:/user/local/bundle/
+      - ../api:/lafiga-api
+      - ./api/bundler_gems:/usr/local/bundle
+      - ../api/translate-key.json:/lafiga-api/translate-key.json:ro
     ports:
       - "3001:3001"
     depends_on:
       - database
-
-  front:
-    build: ./front/
-    container_name: lafiga_front
-    image: lafiga/front-develop:latest
-    tty: true
-    volumes:
-      - ./front/app:/app
-      - /app/node_modules
-    ports:
-      - "3000:3000"
+      - redis
     environment:
-      - NODE_ENV=development
+      RAILS_ENV: development
+      JWT_SECRET: changeme-dev-secret
+      GOOGLE_APPLICATION_CREDENTIALS: /lafiga-api/translate-key.json
+      REDIS_URL: redis://redis:6379/1
+
+  # SPA Vite (repo lafiga-web) — http://localhost:5173
+  # Clone: git clone https://github.com/alyssonjs/lafiga-web.git ../lafiga-web
+  # O antigo Next.js ficava em ../front na porta 3000.
+  front:
+    image: node:20
+    container_name: lafiga_front
+    restart: unless-stopped
+    tty: true
+    working_dir: /app
+    command: sh -c "npm ci || npm install && npm run dev"
+    volumes:
+      - ../lafiga-web:/app
+      - front_lafiga_node_modules:/app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      NODE_ENV: development
+      # Chamadas à API partem do browser → usar host da máquina (não o nome do serviço Docker)
+      VITE_API_BASE_URL: http://localhost:3001
+      VITE_USE_MOCK_DATA: "false"
+      VITE_DEFAULT_PLAYER_ROLE_ID: "12"
+    depends_on:
+      - api
+
+volumes:
+  front_lafiga_node_modules:
