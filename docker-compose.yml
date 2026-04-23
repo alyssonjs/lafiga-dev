@@ -44,10 +44,13 @@ services:
       JWT_SECRET: changeme-dev-secret
       GOOGLE_APPLICATION_CREDENTIALS: /lafiga-api/translate-key.json
       REDIS_URL: redis://redis:6379/1
+      # Opcional: reset de senha pelo mestre em /dm/users (POST …/dm_users/:id/reset_password)
+      DM_PASSWORD_RESET_DEFAULT: ${DM_PASSWORD_RESET_DEFAULT:-TempDmResetDev99}
 
-  # SPA Vite (repo lafiga-web) — http://localhost:5173
-  # Clone: git clone https://github.com/alyssonjs/lafiga-web.git ../lafiga-web
-  # O antigo Next.js ficava em ../front na porta 3000.
+  # SPA Vite (Vite) — http://localhost:5173
+  # Monta `../front-lafiga` (monorepo). O submodule `../lafiga-web` aponta para o
+  # mesmo repositório remoto; se montares a pasta errada, o container não vê
+  # o código que estás a editar em front-lafiga.
   front:
     image: node:20
     container_name: lafiga_front
@@ -56,7 +59,7 @@ services:
     working_dir: /app
     command: sh -c "npm ci || npm install && npm run dev"
     volumes:
-      - ../lafiga-web:/app
+      - ../front-lafiga:/app
       - front_lafiga_node_modules:/app/node_modules
     ports:
       - "5173:5173"

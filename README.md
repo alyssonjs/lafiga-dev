@@ -33,6 +33,17 @@ docker compose up --build
 
 O browser chama a API em `http://localhost:3001` (`VITE_API_BASE_URL`). O CORS da API já inclui a origem do Vite (`5173`).
 
+## API: `db:seed` e opcionais
+
+Com os containers a correr, na pasta **`../api`** (ou `docker compose exec api …`):
+
+```bash
+docker compose exec api bin/rails db:seed
+```
+
+Opcional (mesmo `exec`), ver `api/README.md`: `SEED_MONSTERS=1`,
+`SEED_IMPORTED_SHEETS_REHYDRATE=1`, `SKIP_DND_API=1`.
+
 ## Front antigo (Next.js)
 
 O app em `../front` **não** é mais montado neste compose. Para voltar a usá-lo, restaure o bloco `front` anterior no histórico do Git (volume `../front`, porta `3000`, `NEXT_PUBLIC_API_BASE_URL`).
