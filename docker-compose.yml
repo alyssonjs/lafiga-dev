@@ -67,6 +67,8 @@ services:
       NODE_ENV: development
       # Chamadas à API partem do browser → usar host da máquina (não o nome do serviço Docker)
       VITE_API_BASE_URL: http://localhost:3001
+      # Session feed (chat + dados) via ActionCable SessionFeedChannel — mesmo /cable que mapa/combate
+      VITE_SESSION_FEED_CABLE: "true"
       VITE_USE_MOCK_DATA: "false"
       VITE_DEFAULT_PLAYER_ROLE_ID: "12"
     depends_on:
