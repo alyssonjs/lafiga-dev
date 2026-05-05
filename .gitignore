@@ -1,1 +1,8 @@
 tmp/*
+
+# Local OS/dependency/test artifacts.
+.DS_Store
+/api/bundler_gems/
+/front/package-lock.json
+/create_more_examples.rb
+/test_cleric_creation.rb
