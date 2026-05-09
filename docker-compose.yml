@@ -61,6 +61,9 @@ services:
     volumes:
       - ../front-lafiga:/app
       - front_lafiga_node_modules:/app/node_modules
+      # Mount read-only de `api/config/` para que specs cross-platform
+      # (vitest BDD) leiam o canônico backend (skills.yml etc.) sem copiar.
+      - ../api/config:/api-canonical:ro
     ports:
       - "5173:5173"
     environment:
