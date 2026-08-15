@@ -46,6 +46,10 @@ services:
       REDIS_URL: redis://redis:6379/1
       # Opcional: reset de senha pelo mestre em /dm/users (POST …/dm_users/:id/reset_password)
       DM_PASSWORD_RESET_DEFAULT: ${DM_PASSWORD_RESET_DEFAULT:-TempDmResetDev99}
+      # Web Push (VAPID) — chaves de DEV (prod usa deploy/.env.production com chaves próprias)
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-BPni9bfNI9z9SOQVCaCwYWMCzvgYnd-CynqR2imRQuQl876U5BGtY0srp5e8VDGk5lz2_JNLghCFjgrk7DcIuY4=}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-c6r1j0K0VlogNRMiZtb2tBbHY6dV2Blu3_8yYqcBgWU=}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:dev@lafiga.com.br}
 
   # SPA Vite (Vite) — http://localhost:5173
   # Monta `../front-lafiga` (monorepo). O submodule `../lafiga-web` aponta para o
