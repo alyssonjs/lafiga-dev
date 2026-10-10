@@ -51,6 +51,28 @@ services:
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-c6r1j0K0VlogNRMiZtb2tBbHY6dV2Blu3_8yYqcBgWU=}
       VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:dev@lafiga.com.br}
 
+  # O relógio do mundo (L0.5): o laço que avança as vilas a cada 15 s (`bin/rails mundo:relogio`). A mesma imagem e o
+  # mesmo código montado da api; o código novo entra a cada ronda (o reloader do Rails). Para parar e subir:
+  # `docker compose stop relogio` / `docker compose start relogio`; o log: `docker logs -f lafiga_relogio`.
+  relogio:
+    image: lafiga/api-develop:latest
+    container_name: lafiga_relogio
+    restart: unless-stopped
+    command: bundle exec rails mundo:relogio
+    working_dir: /lafiga-api
+    volumes:
+      - ../api:/lafiga-api
+      - ./api/bundler_gems:/usr/local/bundle
+    depends_on:
+      - database
+      - redis
+      - api
+    environment:
+      RAILS_ENV: development
+      JWT_SECRET: changeme-dev-secret
+      REDIS_URL: redis://redis:6379/1
+    stop_grace_period: 20s
+
   # SPA Vite (Vite) — http://localhost:5173
   # Monta `../front-lafiga` (monorepo). O submodule `../lafiga-web` aponta para o
   # mesmo repositório remoto; se montares a pasta errada, o container não vê

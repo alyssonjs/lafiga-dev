@@ -26,6 +26,7 @@ docker compose up --build
 | **API Rails** | http://localhost:3001 |
 | **PostgreSQL** | `localhost:5432` (user `lafiga_api`, DB `lafiga-api_db_1`) |
 | **Redis** | `localhost:6379` |
+| **Relógio do mundo** | sem porta: o laço `bin/rails mundo:relogio` (`docker logs -f lafiga_relogio`) |
 
 O browser chama a API em `http://localhost:3001` (`VITE_API_BASE_URL`). O CORS da API já inclui a origem do Vite (`5173`). O WebSocket do ActionCable usa **`ws://localhost:3001/cable`** (derivado no front a partir da mesma base); `config.action_cable.allowed_request_origins` em development já inclui `http://localhost:5173`.
 
@@ -39,6 +40,13 @@ docker compose exec api bin/rails db:seed
 
 Opcional (mesmo `exec`), ver `api/README.md`: `SEED_MONSTERS=1`,
 `SEED_IMPORTED_SHEETS_REHYDRATE=1`, `SKIP_DND_API=1`.
+
+Para a vila (roadmap L1.1): o relógio e a campanha de Argoba para um grupo. Roda à parte do `db:seed`, que apaga
+usuários e grupos, e pode rodar de novo sem duplicar:
+
+```bash
+docker compose exec api bin/rails "mundo:semear_argoba[GROUP_ID]"
+```
 
 ## Front antigo (Next.js)
 
